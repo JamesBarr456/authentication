@@ -29,6 +29,45 @@ export const register = async (req, res) => {
     }
   
 }
-export const login = (req, res) => {
-    res.send("yo voy a hacer la funcion de login")
+export const login = async (req, res) => {
+  const { email, password} = req.body  
+  
+    try {
+        
+        const userFound = await User.findOne({ email: email}) //true or false
+
+        if( !userFound )  return res.status(400).json({ message : "email invalid"})
+
+       const isMatch = bcrypt.compare(password, userFound.password) //true or false
+
+       if(!isMatch) return res.status(400).json({ message: "password invalid"})
+
+        const token = await creatAccessToken({ id : userFound._id}) //---> igual le creamos un token 
+   
+        res.cookie("token", token) //---> mandamos a la cookie
+        res.json({
+            id: userFound._id,
+            username: userFound.username,
+            email : userFound.email,
+        }) 
+        
+    } catch (error) {
+        res.status(500).json( { message : error.message } )
+    }
+}
+
+export const loguot = async (req, res) => {
+    //cuando vamos a hacer un loguot debemos limpiar la cookie
+    res.cookie("token", "", { expires: new Date(0)} )
+    return res.sendStatus(200)
+}
+
+export const profile = async (req, res) => {
+    const userFound = await User.findById(req.user.id)
+    if (userFound) return res.status(400).json({ message: "User not found"})
+    return res.json({
+            id: userFound._id,
+            username: userFound.username,
+            email : userFound.email,
+        }) 
 }
