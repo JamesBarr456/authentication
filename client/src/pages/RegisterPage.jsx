@@ -2,11 +2,11 @@ import { Button, Input, LayoutFormAuth } from "../components"
 import { useForm } from "react-hook-form"
 import { useAuth } from "../hooks/useAuth";
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 
 function RegisterPage() {
   const {register, handleSubmit, formState: {errors}} = useForm()
-  const { singUp,  isAuthenticated, error: RegisterError } = useAuth()
+  const { signUp,  isAuthenticated, error: registerError } = useAuth()
   const title = "Sing up";
   const navigate = useNavigate()
 
@@ -21,7 +21,7 @@ function RegisterPage() {
       title={title}
     >
       {
-        RegisterError.map((error, i) =>(
+        registerError.map((error, i) =>(
           <span key={i} className="bg-red-500 text-white p-2 my-1 rounded-xl ">{error}</span>
         ))
 
@@ -30,7 +30,7 @@ function RegisterPage() {
         onSubmit={ 
           handleSubmit(async values => {
             console.log(values)
-            // singUp(values)
+            // signUp(values)
           })
         }
       
@@ -67,12 +67,12 @@ function RegisterPage() {
             label="Create account"
           />
           <p className="flex justify-center mt-6 font-sans text-sm antialiased font-light leading-normal text-inherit">
-            Do you already have an account?
-            <a 
-              href="/login"
+            Already have an account?
+            <Link 
+              to="/login"
               className="block ml-1 font-sans text-sm antialiased font-bold leading-normal text-blue-gray-900">
               Sing in
-            </a>
+            </Link>
           </p>
         </div>
       </form>
