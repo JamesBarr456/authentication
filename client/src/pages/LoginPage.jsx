@@ -1,16 +1,22 @@
 import { Button, Input, LayoutFormAuth } from "../components";
-import { useForm } from "react-hook-form"
-import { useAuth } from "../hooks/useAuth";
 import { Link, useNavigate } from "react-router-dom";
 
+import { useAuth } from "../hooks/useAuth";
+import { useEffect } from "react";
+import { useForm } from "react-hook-form"
 
 function LoginPage() {
   const {register, handleSubmit, formState: {errors}} = useForm()
-  const { signIn, error: loginError } = useAuth()
+  const { signIn, isAuthenticated, error: loginError } = useAuth()
   
   const navigate = useNavigate()
+
   const title = "Sign in";
-  
+  useEffect(() => {
+    if(isAuthenticated) navigate("/tasks")
+  }, [isAuthenticated, navigate])
+
+
   return (
     <LayoutFormAuth title={title}>
        {
@@ -21,8 +27,7 @@ function LoginPage() {
       }
      <form onSubmit={
           handleSubmit(async values => {
-            console.log(values)
-            // signIn(values)
+            signIn(values)
             
           })
      }>

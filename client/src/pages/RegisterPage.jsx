@@ -1,8 +1,9 @@
 import { Button, Input, LayoutFormAuth } from "../components"
-import { useForm } from "react-hook-form"
+import { Link, useNavigate } from "react-router-dom"
+
 import { useAuth } from "../hooks/useAuth";
 import { useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom"
+import { useForm } from "react-hook-form"
 
 function RegisterPage() {
   const {register, handleSubmit, formState: {errors}} = useForm()
@@ -15,34 +16,52 @@ function RegisterPage() {
   }, [isAuthenticated, navigate])
 
 
-  
+  console.log(registerError)
   return (
     <LayoutFormAuth 
       title={title}
     >
       {
         registerError.map((error, i) =>(
-          <span key={i} className="bg-red-500 text-white p-2 my-1 rounded-xl ">{error}</span>
+          <span 
+            key={i} 
+            className="bg-red-500 text-white text-xs p-2 mx-6 my-2  rounded-lg "
+          >
+            {error}
+          </span>
         ))
 
       }
       <form 
         onSubmit={ 
+
           handleSubmit(async values => {
             console.log(values)
-            // signUp(values)
+          signUp(values)
           })
         }
       
       >
         <div className="flex flex-col gap-4 p-6">
           <Input 
-            {...register("username", {required: true})}
+            {...register("username", {
+              required: "Username is required", // Mensaje para campo requerido
+              validate: {
+                isString: (value) => {
+                  // Verifica si el valor es numérico
+                  return (value && isNaN(value)) ? true : "Expected string, received number";
+                }
+              }
+            })}
             type="text" 
             name="username" 
             label="Username" 
           />
-          { errors.username && ( <p className="text-center text-red-500 font-bold w-full">Username is required</p>)}
+          {errors.username && (
+            <p className="text-center text-xs text-red-500 font-bold w-full">
+              {errors.username.message}
+            </p>
+          )}
 
           <Input 
             {...register("email", {required: true})} 
@@ -50,7 +69,7 @@ function RegisterPage() {
             name="email" 
             type="email"
           />
-          { errors.email && ( <p className="text-center text-red-500 font-bold  w-full">Email is required</p>)}
+          { errors.email && ( <p className="text-center text-xs text-red-500 font-bold  w-full">Email is required</p>)}
 
           <Input 
             {...register("password", {required: true})} 
@@ -58,7 +77,7 @@ function RegisterPage() {
             name="password" 
             type="password"
           />
-          { errors.password && ( <p className="text-center text-red-500 font-bold  w-full">Password is required</p>)}
+          { errors.password && ( <p className="text-center text-xs text-red-500 font-bold  w-full">Password is required</p>)}
 
         </div>
         <div className="p-6 pt-0">

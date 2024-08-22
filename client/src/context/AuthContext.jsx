@@ -1,6 +1,7 @@
 import { createContext, useEffect, useState } from "react";
-import PropTypes from 'prop-types';
 import { loginRequest, registerRequest } from "../api/auth";
+
+import PropTypes from 'prop-types';
 
 export const AuthContext = createContext();
 
@@ -14,8 +15,8 @@ export const AuthProvider = ({children}) => {
     useEffect(() => {
         if(error.length > 0) {
             const timer = setTimeout(() => {
-                setError([],4000)
-            })
+                setError([])
+            },3000)
         return () => clearTimeout(timer)
         }
     }, [error])
@@ -23,10 +24,13 @@ export const AuthProvider = ({children}) => {
     const signUp = async ( user ) => {
         try {
             const res = await registerRequest( user )
+            console.log(res.data)
             setUser( res.data )
             setIsAuthenticated(true)
         } catch (error) {
-            setError(error.response.data)
+            console.log(error)
+            setError(error.response.data.errors)
+          
         }
       
     }
@@ -34,7 +38,8 @@ export const AuthProvider = ({children}) => {
     const signIn = async ( user ) => {
         try {
             const res = await loginRequest( user )
-           
+            setUser( res.data )
+            setIsAuthenticated(true)
         } catch (error) {
             if (Array.isArray(error.response.data)){
                 return setError(error.response.data)
