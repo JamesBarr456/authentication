@@ -6,6 +6,9 @@ export const register = async (req, res) => {
    const { email, password, username } = req.body //Esto es el body que recibo de la request a traves de la peticion HTTP y ahora debemos guardarlo
   
     try {
+        const userFound = await User.findOne({ email })
+        if (userFound) return res.status(400).json( ["The email already exists"])
+
         const passwordHash = await bcrypt.hash(password, 10) // ---> se hashea el codigo
         const newUser = new User( // ---> se crea el usuario
             {
