@@ -11,7 +11,7 @@ export const AuthContext = createContext();
 export const AuthProvider = ({children}) => {
     const [ user, setUser] = useState([])
     const [ isAuthenticated, setIsAuthenticated] = useState(false)
-    const [ error, setError] = useState([])
+    const [ error, setError] = useState(null)
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
@@ -24,33 +24,28 @@ export const AuthProvider = ({children}) => {
     }, [error])
 
     useEffect(() => {
-      async function checkLogin() {
-        const cookies = Cookies.get()
-        console.log(cookies)
-        if(!cookies.token) {
-           setIsAuthenticated(false)
-           setLoading(false)
-           return setUser(null) 
-        }
-        
+      async function checkLogin() {  
+        setLoading(true);
         try {
+            const cookies = Cookies.get()
+            if(!cookies.token) throw new Error("Token not available")
+
             const res =  await verityTokenRequest(cookies.token)
             if(!res.data) {
                 setIsAuthenticated(false)
-                setLoading(false)
-                return 
+                // setLoading(false)
+                setUser(null)  
+            } else {
+                setIsAuthenticated(true)
+                // setLoading(false)
+                setUser(res.data)
             }
-            setIsAuthenticated(true)
-            setUser(res.data)
-            setLoading(false)
         } catch (error) {
-            setIsAuthenticated(false)
-            setUser(null)
-            setLoading(false)
-            
+            console.log(error)
+        }  finally {
+            setLoading(false);
         }
       }
-
       checkLogin()
     }, [])
 
@@ -58,13 +53,10 @@ export const AuthProvider = ({children}) => {
     const signUp = async ( user ) => {
         try {
             const res = await registerRequest( user )
-            console.log(res.data)
             setUser( res.data )
             setIsAuthenticated(true)
         } catch (error) {
-            console.log(error)
             setError(error.response.data.errors)
-          
         }
       
     }
@@ -74,8 +66,8 @@ export const AuthProvider = ({children}) => {
             const res = await loginRequest( user )
             setUser( res.data )
             setIsAuthenticated(true)
+            setLoading(false)
         } catch (error) {
-            console.log(error)
             const errorMessages = Array.isArray(error.response.data.errors)
             ? error.response.data.errors
             : [error.response.data.errors];

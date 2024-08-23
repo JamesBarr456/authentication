@@ -38,8 +38,10 @@ export const login = async (req, res) => {
   const { email, password} = req.body  
   
     try {
-        
-        const userFound = await User.findOne({ email}) //true or false
+
+        //-------------------------Verificaciones--------------------------------
+
+        const userFound = await User.findOne({ email}) //---> buscar si el email existe true or false
 
         if( !userFound )  return res.status(400).json({ errors : "User not found"})
 
@@ -47,7 +49,9 @@ export const login = async (req, res) => {
 
        if(!isMatch) return res.status(400).json({errors : ["Password invalid"]})
 
-        const token = await creatAccessToken({ id : userFound._id}) //---> igual le creamos un token 
+        //-----------------------------------------------------------------------
+
+        const token = await creatAccessToken({ id : userFound._id}) //---> Creamos un token 
    
         res.cookie("token", token) //---> mandamos a la cookie
         res.json({
@@ -77,41 +81,26 @@ export const profile = async (req, res) => {
         }) 
 }
 
-export const verifyToken = async (req, res) => {
-    const { token } = req.cookies;
-
-    if (!token) {
-        return res.status(401).json({ errors: 'Unauthorized: No token provided' });
-    }
-
-    try {
-        // Verifica el token usando una promesa
-        const decoded = await new Promise((resolve, reject) => {
-            jwt.verify(token, TOKEN_SECRET, (err, decoded) => {
-                if (err) {
-                    reject(new Error('Unauthorized: Invalid token'));
-                } else {
-                    resolve(decoded);
-                }
-            });
-        });
-
-        // Asegúrate de extraer solo el valor del id
-        const userFound = await User.findById(decoded.id);
-
-        if (!userFound) {
-            return res.status(401).json({ errors: 'Unauthorized: User not found' });
-        }
-
-        // Responde con los datos del usuario
-        return res.json({
-            id: userFound._id,
-            username: userFound.username,
-            email: userFound.email,
-        });
-
-    } catch (error) {
-        console.error('Token verification error:', error.message);
-        return res.status(401).json({ errors: error.message });
-    }
-};
+export const verifyToken = async ( req , res ) => { 
+		const token = req.headers.authorization?.split( ' ' )[1];
+		if ( !token ) return res.status( 401 ).json( { errors : "No token provided" } );
+		try {
+		    const tokenVerif = new Promise( ( resolve, reject ) => {
+			jwt.verify( token, TOKEN_SECRET, (err , decoded ) => {	
+				if ( err ) {
+				    reject(new Error ('Unauthorized: Invalid token'));
+				} else {
+                   	resolve(decoded);
+                }})
+            }) //---> aqui termina el tokenVerif || deberiamos de recibir los datos decodificados si se verifico el token.
+		    const userFound = await User.findById( tokenVerif.id )  		
+		    if (!userFound) return res.status(401).json({ errors: 'Unauthorized: User not found' });
+        	return res.json({
+                id: userFound._id,
+           		username: userFound.username,
+            	email: userFound.email,
+       		});
+		} catch ( error )  {
+        	return res.status(500).json({ errors: error.message });
+  		 }
+	}

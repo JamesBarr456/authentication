@@ -7,11 +7,12 @@ import { useForm } from "react-hook-form"
 
 function LoginPage() {
   const {register, handleSubmit, formState: {errors}} = useForm()
-  const { signIn, isAuthenticated, error: loginError } = useAuth()
+  const { signIn, isAuthenticated, error: loginError, loading } = useAuth()
   
   const navigate = useNavigate()
 
   const title = "Sign in";
+
   useEffect(() => {
     if(isAuthenticated) navigate("/tasks")
   }, [isAuthenticated, navigate])
@@ -52,10 +53,11 @@ function LoginPage() {
       </div>
 
       <div className="p-6 pt-0">
-        <Button 
-          label="Access" 
-          type="submit"
-        />
+         <Button
+            label={loading ? "Loading..." : "Access"} 
+            type="submit"
+            disabled={loading} 
+          />
         <p className="flex justify-center mt-6 font-sans text-sm antialiased font-light leading-normal text-inherit">
           Don&apos;t have an account?
           <Link 

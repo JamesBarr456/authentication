@@ -7,7 +7,7 @@ import { useForm } from "react-hook-form"
 
 function RegisterPage() {
   const {register, handleSubmit, formState: {errors}} = useForm()
-  const { signUp,  isAuthenticated, error: registerError } = useAuth()
+  const { signUp,  isAuthenticated, error: registerError, loading } = useAuth()
   const title = "Sing up";
   const navigate = useNavigate()
 
@@ -16,7 +16,6 @@ function RegisterPage() {
   }, [isAuthenticated, navigate])
 
 
-  console.log(registerError)
   return (
     <LayoutFormAuth 
       title={title}
@@ -82,8 +81,9 @@ function RegisterPage() {
         </div>
         <div className="p-6 pt-0">
           <Button 
+           disabled={loading}
             type="submit" 
-            label="Create account"
+            label={loading ? "Creating..." : "Creat acount"} 
           />
           <p className="flex justify-center mt-6 font-sans text-sm antialiased font-light leading-normal text-inherit">
             Already have an account?
