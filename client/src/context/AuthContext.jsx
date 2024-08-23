@@ -1,6 +1,7 @@
 import { createContext, useEffect, useState } from "react";
-import { loginRequest, registerRequest } from "../api/auth";
+import { loginRequest, registerRequest, verityTokenRequest } from "../api/auth";
 
+import Cookies from "js-cookie"
 import PropTypes from 'prop-types';
 
 export const AuthContext = createContext();
@@ -11,6 +12,7 @@ export const AuthProvider = ({children}) => {
     const [ user, setUser] = useState([])
     const [ isAuthenticated, setIsAuthenticated] = useState(false)
     const [ error, setError] = useState([])
+    const [loading, setLoading] = useState(true)
 
     useEffect(() => {
         if(error.length > 0) {
@@ -20,6 +22,38 @@ export const AuthProvider = ({children}) => {
         return () => clearTimeout(timer)
         }
     }, [error])
+
+    useEffect(() => {
+      async function checkLogin() {
+        const cookies = Cookies.get()
+        console.log(cookies)
+        if(!cookies.token) {
+           setIsAuthenticated(false)
+           setLoading(false)
+           return setUser(null) 
+        }
+        
+        try {
+            const res =  await verityTokenRequest(cookies.token)
+            if(!res.data) {
+                setIsAuthenticated(false)
+                setLoading(false)
+                return 
+            }
+            setIsAuthenticated(true)
+            setUser(res.data)
+            setLoading(false)
+        } catch (error) {
+            setIsAuthenticated(false)
+            setUser(null)
+            setLoading(false)
+            
+        }
+      }
+
+      checkLogin()
+    }, [])
+
 
     const signUp = async ( user ) => {
         try {
@@ -41,10 +75,11 @@ export const AuthProvider = ({children}) => {
             setUser( res.data )
             setIsAuthenticated(true)
         } catch (error) {
-            if (Array.isArray(error.response.data)){
-                return setError(error.response.data)
-            }
-            setError([error.response.data])
+            console.log(error)
+            const errorMessages = Array.isArray(error.response.data.errors)
+            ? error.response.data.errors
+            : [error.response.data.errors];
+            setError(errorMessages);
         }
       
     }
@@ -56,6 +91,7 @@ export const AuthProvider = ({children}) => {
                 user,
                 isAuthenticated,
                 error,
+                loading
             }}
         >
             { children}

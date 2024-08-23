@@ -6,7 +6,10 @@ import morgan from 'morgan';
 import taskRoutes from './routes/task.routes.js'
 
 const app = express();
-app.use(cors())
+app.use(cors({
+    origin: 'http://localhost:5173', 
+    credentials: true
+}))
 app.use(morgan("dev"))
 app.use(express.json()) //middleware para pasar la req.body en json3
 app.use(cookieParser())
@@ -14,4 +17,5 @@ app.use(cookieParser())
 
 app.use("/api" , authRoutes)
 app.use("/api",taskRoutes)
+
 export default app

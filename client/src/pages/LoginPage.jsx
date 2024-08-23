@@ -21,12 +21,13 @@ function LoginPage() {
     <LayoutFormAuth title={title}>
        {
         loginError.map((error, i) =>(
-          <span key={i} className="bg-red-500 text-white p-2 my-1 rounded-xl ">{error}</span>
+          <span key={i} className="bg-red-500 text-white text-xs p-2 mx-6 my-2  rounded-lg ">{error}</span>
         ))
 
       }
      <form onSubmit={
           handleSubmit(async values => {
+         
             signIn(values)
             
           })
