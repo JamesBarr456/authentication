@@ -20,7 +20,7 @@ export const register = async (req, res) => {
                }
         )
         const userSaved = await newUser.save() //ya me da el creadAt y updateAt ---> se guarda el usuario 
-        const token = await creatAccessToken({ id : userSaved._id})
+        const token = await creatAccessToken(userSaved._id)
    
         res.cookie("token", token) //---> se le manda el token al front por medio de la cookie
         res.json({//una buena practica es no devolver toda la informacion si no la necesaria para el front end 
@@ -51,9 +51,9 @@ export const login = async (req, res) => {
 
         //-----------------------------------------------------------------------
 
-        const token = await creatAccessToken({ id : userFound._id}) //---> Creamos un token 
+        const token = await creatAccessToken(userFound._id) //---> Creamos un token 
    
-        res.cookie("token", token) //---> mandamos a la cookie
+        res.cookie("token", token) //---> mandamos a la cookie ---->>> ESTO NO VA ENTONCES 
         res.json({
             id: userFound._id,
             username: userFound.username,
@@ -85,7 +85,7 @@ export const verifyToken = async ( req , res ) => {
 		const token = req.headers.authorization?.split( ' ' )[1];
 		if ( !token ) return res.status( 401 ).json( { errors : "No token provided" } );
 		try {
-		    const tokenVerif = new Promise( ( resolve, reject ) => {
+		    const tokenVerif = await new Promise( ( resolve, reject ) => {
 			jwt.verify( token, TOKEN_SECRET, (err , decoded ) => {	
 				if ( err ) {
 				    reject(new Error ('Unauthorized: Invalid token'));
@@ -93,9 +93,12 @@ export const verifyToken = async ( req , res ) => {
                    	resolve(decoded);
                 }})
             }) //---> aqui termina el tokenVerif || deberiamos de recibir los datos decodificados si se verifico el token.
-		    const userFound = await User.findById( tokenVerif.id )  		
-		    if (!userFound) return res.status(401).json({ errors: 'Unauthorized: User not found' });
-        	return res.json({
+    
+		    const userFound = await User.findById( tokenVerif.id )  
+        
+		    if (!userFound) return res.status(401).json({ errors: `Unauthorized: User not found ${userFound}}` });
+        	
+            return res.json({
                 id: userFound._id,
            		username: userFound.username,
             	email: userFound.email,
@@ -103,4 +106,4 @@ export const verifyToken = async ( req , res ) => {
 		} catch ( error )  {
         	return res.status(500).json({ errors: error.message });
   		 }
-	}
+}

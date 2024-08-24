@@ -11,7 +11,7 @@ export const AuthContext = createContext();
 export const AuthProvider = ({children}) => {
     const [ user, setUser] = useState([])
     const [ isAuthenticated, setIsAuthenticated] = useState(false)
-    const [ error, setError] = useState(null)
+    const [ error, setError] = useState([])
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
@@ -28,16 +28,17 @@ export const AuthProvider = ({children}) => {
         setLoading(true);
         try {
             const cookies = Cookies.get()
+            // console.log(cookies) --> si lee las cookies 
             if(!cookies.token) throw new Error("Token not available")
 
             const res =  await verityTokenRequest(cookies.token)
             if(!res.data) {
                 setIsAuthenticated(false)
-                // setLoading(false)
-                setUser(null)  
+                setLoading(false)
+                setUser([])  
             } else {
                 setIsAuthenticated(true)
-                // setLoading(false)
+                setLoading(false)
                 setUser(res.data)
             }
         } catch (error) {
@@ -73,13 +74,19 @@ export const AuthProvider = ({children}) => {
             : [error.response.data.errors];
             setError(errorMessages);
         }
-      
+    }
+    const signOut = () => {
+        Cookies.remove ("token");
+        setIsAuthenticated(false)
+        setUser([])
+        setLoading(true)
     }
     return (
         <AuthContext.Provider 
             value = {{
                 signUp,
                 signIn,
+                signOut,
                 user,
                 isAuthenticated,
                 error,

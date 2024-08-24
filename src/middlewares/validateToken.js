@@ -1,8 +1,8 @@
-import jwt from 'jsonwebtoken';
 import { TOKEN_SECRET } from '../config.js';
+import jwt from 'jsonwebtoken';
 
 const authRequired = (req, res, next) => { // ---> next es otro parametro tipico de los middlewares, sirve para que en ves de retornar algo simplemente le digamos al codigo "bueno si validaste, continua el bloque"
-  const { token } = req.cookie
+  const { token } = req.cookies
   if(!token) return res.status(401).json( { message : "No token, authorization denied.-"}) //--> Si no hay un token, se responde con un estado 401 (Unauthorized), indicando que no se proporcionó un token y, por lo tanto, la autorización fue denegada.
   
     jwt.verify(token, TOKEN_SECRET, (err, user) => {

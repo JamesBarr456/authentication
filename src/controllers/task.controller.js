@@ -1,6 +1,7 @@
 import Task from '../models/task.model.js'
 
 export const getTasks = async (req, res) => {
+
     const tasks = await Task.find({
         user: req.user.id // ----> Le digo que busque solo las task con el id del usuario logueado.
     }).populate('user') // ---> luego que ademas como existe una relacion que me traiga toda la info de ese usuario

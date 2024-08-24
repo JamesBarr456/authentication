@@ -4,9 +4,8 @@ import { useAuth } from "./hooks/useAuth"
 
 function ProtectedRoute() {
  const {loading , isAuthenticated }= useAuth()
- console.log(loading, isAuthenticated)
- 
-  if ( loading ) return <h1>Loading......</h1>
+
+  if ( loading ) return <h1 className="text-white text-3xl font-bold">Loading......</h1>
   
   if (!isAuthenticated) return <Navigate to = "/login" replace/>
 
