@@ -1,5 +1,5 @@
 import { createContext, useState } from "react";
-import { createTasksRequest, deleteTasksRequest, getTasksRequest, updateTasksRequest } from "../api/tasks";
+import { createTasksRequest, deleteTasksRequest, getTaskRequest, getTasksRequest, updateTasksRequest } from "../api/tasks";
 
 import PropTypes from 'prop-types';
 
@@ -30,11 +30,17 @@ const deleteTasks = async ( id ) => {
      console.log(error)
 }}
 
-    
-
-const updateTasks = async ( id ) => {
+const updateTask = async ( id, task ) => {
     try {
-        const res = await updateTasksRequest( id )   
+        const res = await updateTasksRequest( id , task )   
+    } catch (error) {
+        console.log(error)
+    }
+}
+const getTask = async ( id ) => {
+    try {
+        const res =  await getTaskRequest( id )
+        return res.data
     } catch (error) {
         console.log(error)
     }
@@ -47,7 +53,8 @@ const updateTasks = async ( id ) => {
                 createTasks,
                 getTasks,
                 deleteTasks,
-                updateTasks,
+                updateTask,
+                getTask
 
             }}
         >

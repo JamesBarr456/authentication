@@ -1,16 +1,38 @@
+import { useNavigate, useParams } from "react-router-dom"
+
 import { Button } from "../components"
+import { useEffect } from "react"
 import { useForm } from "react-hook-form"
-import { useNavigate } from "react-router-dom"
 import { useTasks } from "../hooks/useTasks"
 
 function TaskFormPage() {
-  const {register, handleSubmit, formState: {errors}} = useForm()
-  const { createTasks } = useTasks()
+  const {register, handleSubmit, setValue, formState: {errors}} = useForm()
+  const { createTasks, updateTask, getTask } = useTasks()
   const navigate = useNavigate()
+  const params = useParams()
+
+  useEffect( 
+     () => {
+      async function loadTask() {
+        if(params.id) {
+          const taks = await getTask(params.id)
+          setValue('title', taks.title)
+          setValue('description', taks.description)
+        }
+      }
+      loadTask()
+     }, []
+  )
   return (
     <form onSubmit={
-      handleSubmit( data => {
-        createTasks(data)
+
+      handleSubmit( data =>  {
+        if(params.id){
+          updateTask(params.id , data)
+        } else {
+          createTasks(data)
+         
+        }
         navigate("/tasks")
       } )
     }>
