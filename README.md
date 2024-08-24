@@ -35,14 +35,14 @@ Este proyecto fue desarrollado para practicar las bases de Node.js y Express.js 
 2. Cambia el nombre del archivo config-example.js a config.js.
 
 3. Dentro del archivo "config.js", configura las siguientes variables:
-       ```bash
-export const PORT = "Coloca el puerto donde quieres ejecutar el proyecto";
-export const DB_HOST = "localhost";
-export const TOKEN_SECRET = "Coloca tu TOKEN_SECRET para jwt";
-export const DB_URL = "Coloca la URL de la base de datos MongoDB";
-        ```
+      ```javascript
+    export const PORT = "Coloca el puerto donde quieres ejecutar el proyecto";
+    export const DB_HOST = "localhost";
+    export const TOKEN_SECRET = "Coloca tu TOKEN_SECRET para jwt";
+    export const DB_URL = "Coloca la URL de la base de datos MongoDB";
+       
 
-4. Ejecuta el proyecto, tanto el back-end como el front-end y estará listo para usar.
+5. Ejecuta el proyecto, tanto el back-end como el front-end y estará listo para usar.
     ```bash
     npm run dev
     ```
